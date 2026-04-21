@@ -1,16 +1,13 @@
-data:
+# bcs: !dict '{% raw %}{{% endraw %}{% for x in _.bcs.validtimes %}{{ x }}: {{ x }},{% endfor %}{% raw %}}{% endraw %}'
+ics:
   '{{ _.ics.prev.dst }}_surface_f01.grib2': '{{ _.ics.prev.src }}.wrfsfcf01.grib2'
   '{{ _.ics.this.dst }}_pressure.grib2': '{{ _.ics.this.src }}.wrfprsf00.grib2'
   '{{ _.ics.this.dst }}_surface.grib2': '{{ _.ics.this.src }}.wrfsfcf00.grib2'
 _:
-#   bcs:
-#     prev:
-#       dst:
-#       src:
-#     this:
-#       dst:
-#       src:
-#     urlbase: https://noaa-gfs-bdp-pds.s3.amazonaws.com
+  bcs:
+    maxleadtime: !int '{{ (leadtime.total_seconds() / 3600) | int}}'
+    urlbase: https://noaa-gfs-bdp-pds.s3.amazonaws.com
+    validtimes: !list '[{% for n in range(1, maxleadtime + 1) %}{{ cycle + (_.delta * n) }},{% endfor %}]'
   ics:
     prev:
       dst: hrrr_{{ _.cycles.prev.yyyymmdd }}_{{ _.cycles.prev.hh }}
@@ -20,11 +17,14 @@ _:
       src: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
     urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   cycles:
+    nearest:
+      offset: !timedelta '00:00:{{ cycle.timestamp() % (3600 * 6) | int }}'
+      synoptic: !datetime '{{ cycle - _.cycles.nearest.offset }}'
     prev:
-      cycle: !datetime '{{ cycle - _.cycles.prev.delta }}'
-      delta: !timedelta 01:00:00
+      cycle: !datetime '{{ cycle - _.delta }}'
       hh: '{{ _.cycles.prev.cycle.strftime("%H") }}'
       yyyymmdd: '{{ _.cycles.prev.cycle.strftime("%Y%m%d") }}'
     this:
       hh: '{{ cycle.strftime("%H") }}'
       yyyymmdd: '{{ cycle.strftime("%Y%m%d") }}'
+  delta: !timedelta 01:00:00
