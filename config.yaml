@@ -1,0 +1,4 @@
+ics:
+  hrrr_20260420_11_surface_f01.grib2: https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.20260420/conus/hrrr.t11z.wrfsfcf01.grib2
+  hrrr_20260420_12_pressure.grib2: https://noaa-hrrr-bdp-pds.s3.amazonaws.com//hrrr.20260420/conus/hrrr.t12z.wrfprsf00.grib2
+  hrrr_20260420_12_surface.grib2: https://noaa-hrrr-bdp-pds.s3.amazonaws.com//hrrr.20260420/conus/hrrr.t12z.wrfsfcf00.grib2
