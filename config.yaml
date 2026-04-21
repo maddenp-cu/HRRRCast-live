@@ -1,4 +1,20 @@
 ics:
-  hrrr_20260420_11_surface_f01.grib2: https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.20260420/conus/hrrr.t11z.wrfsfcf01.grib2
-  hrrr_20260420_12_pressure.grib2: https://noaa-hrrr-bdp-pds.s3.amazonaws.com//hrrr.20260420/conus/hrrr.t12z.wrfprsf00.grib2
-  hrrr_20260420_12_surface.grib2: https://noaa-hrrr-bdp-pds.s3.amazonaws.com//hrrr.20260420/conus/hrrr.t12z.wrfsfcf00.grib2
+  '{{ _.prev.pre.dst }}_surface_f01.grib2': '{{ _.prev.pre.src }}.wrfsfcf01.grib2'
+  '{{ _.this.pre.dst }}_pressure.grib2': '{{ _.this.pre.src }}.wrfprsf00.grib2'
+  '{{ _.this.pre.dst }}_surface.grib2': '{{ _.this.pre.src }}.wrfsfcf00.grib2'
+_:
+  prev:
+    cycle: !datetime '{{ cycle - delta }}'
+    delta: !timedelta 01:00:00
+    hh: '{{ _.prev.cycle.strftime("%H") }}'
+    yyyymmdd: '{{ _.prev.cycle.strftime("%Y%m%d") }}'
+    pre:
+      src: '{{ _.urlbase }}/hrrr.{{ _.prev.yyyymmdd }}/conus/hrrr.t{{ _.prev.hh }}z'
+      dst: hrrr_{{ _.prev.yyyymmdd }}_{{ _.prev.hh }}
+  this:
+    hh: '{{ cycle.strftime("%H") }}'
+    yyyymmdd: '{{ cycle.strftime("%Y%m%d") }}'
+    pre:
+      src: '{{ _.urlbase }}/hrrr.{{ _.this.yyyymmdd }}/conus/hrrr.t{{ _.this.hh }}z'
+      dst: hrrr_{{ _.this.yyyymmdd }}_{{ _.this.hh }}
+  urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
