@@ -1,12 +1,11 @@
-bcs: !dict '{{ "{" }}
+data: !dict '{{ "{" }}
   {% for x in _.bcs.leadtimes %}
   {{ _.bcs.prefix.dst }}_{{ "%03d" % x }}.grib2: {{ _.bcs.prefix.src }}{{ "%03d" % x }},
   {% endfor %}
+  {{ _.ics.prev.prefix.dst }}_surface_f01.grib2: {{ _.ics.prev.prefix.src }}.wrfsfcf01.grib2,
+  {{ _.ics.this.prefix.dst }}_pressure.grib2: {{ _.ics.this.prefix.src }}.wrfprsf00.grib2,
+  {{ _.ics.this.prefix.dst }}_surface.grib2: {{ _.ics.this.prefix.src }}.wrfsfcf00.grib2,
   {{ "}" }}'
-ics:
-  '{{ _.ics.prev.prefix.dst }}_surface_f01.grib2': '{{ _.ics.prev.prefix.src }}.wrfsfcf01.grib2'
-  '{{ _.ics.this.prefix.dst }}_pressure.grib2': '{{ _.ics.this.prefix.src }}.wrfprsf00.grib2'
-  '{{ _.ics.this.prefix.dst }}_surface.grib2': '{{ _.ics.this.prefix.src }}.wrfsfcf00.grib2'
 _:
   bcs:
     leadtimes: !list '[{{ range(1, maxleadtime + 1) | join(",") }}]'
