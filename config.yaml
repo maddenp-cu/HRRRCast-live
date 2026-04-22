@@ -1,26 +1,29 @@
 bcs: !dict '{{ "{" }}
   {% for x in _.bcs.leadtimes %}
-  {{ _.bcs.dst }}_{{ "%03d" % x }}.grib2: {{ _.bcs.src }}{{ "%03d" % x }},
+  {{ _.bcs.prefix.dst }}_{{ "%03d" % x }}.grib2: {{ _.bcs.prefix.src }}{{ "%03d" % x }},
   {% endfor %}
   {{ "}" }}'
 ics:
-  '{{ _.ics.prev.dst }}_surface_f01.grib2': '{{ _.ics.prev.src }}.wrfsfcf01.grib2'
-  '{{ _.ics.this.dst }}_pressure.grib2': '{{ _.ics.this.src }}.wrfprsf00.grib2'
-  '{{ _.ics.this.dst }}_surface.grib2': '{{ _.ics.this.src }}.wrfsfcf00.grib2'
+  '{{ _.ics.prev.prefix.dst }}_surface_f01.grib2': '{{ _.ics.prev.prefix.src }}.wrfsfcf01.grib2'
+  '{{ _.ics.this.prefix.dst }}_pressure.grib2': '{{ _.ics.this.prefix.src }}.wrfprsf00.grib2'
+  '{{ _.ics.this.prefix.dst }}_surface.grib2': '{{ _.ics.this.prefix.src }}.wrfsfcf00.grib2'
 _:
   bcs:
-    dst: gfs_{{ _.cycles.this.yyyymmdd }}
-    src: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.this.yyyymmdd }}/{{ _.cycles.this.hh }}/atmos/gfs.t{{ _.cycles.this.hh }}z.pgrb2.0p25.f'
     leadtimes: !list '[{{ range(1, maxleadtime + 1) | join(",") }}]'
     maxleadtime: !int '{{ (leadtime.total_seconds() / 3600) | int}}'
+    prefix:
+      dst: gfs_{{ _.cycles.this.yyyymmdd }}
+      src: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.this.yyyymmdd }}/{{ _.cycles.this.hh }}/atmos/gfs.t{{ _.cycles.this.hh }}z.pgrb2.0p25.f'
     urlbase: https://noaa-gfs-bdp-pds.s3.amazonaws.com
   ics:
     prev:
-      dst: hrrr_{{ _.cycles.prev.yyyymmdd }}_{{ _.cycles.prev.hh }}
-      src: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
+      prefix:
+        dst: hrrr_{{ _.cycles.prev.yyyymmdd }}_{{ _.cycles.prev.hh }}
+        src: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
     this:
-      dst: hrrr_{{ _.cycles.this.yyyymmdd }}_{{ _.cycles.this.hh }}
-      src: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
+      prefix:
+        dst: hrrr_{{ _.cycles.this.yyyymmdd }}_{{ _.cycles.this.hh }}
+        src: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
     urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   cycles:
     nearest:
