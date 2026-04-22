@@ -1,6 +1,6 @@
 bcs: !dict '{{ "{" }}
   {% for x in _.bcs.leadtimes %}
-  gfs_{{ _.cycles.this.yyyymmdd }}_{{ "%03d" % x }}.grib2: {{ _.bcs.urlbase }}/gfs.{{ _.cycles.this.yyyymmdd }}/{{ _.cycles.this.hh }}/atmos/gfs.t{{ _.cycles.this.hh }}z.pgrb2.0p25.f{{ "%03d" % x }},
+  {{ _.bcs.dst }}_{{ "%03d" % x }}.grib2: {{ _.bcs.src }}{{ "%03d" % x }},
   {% endfor %}
   {{ "}" }}'
 ics:
@@ -9,6 +9,8 @@ ics:
   '{{ _.ics.this.dst }}_surface.grib2': '{{ _.ics.this.src }}.wrfsfcf00.grib2'
 _:
   bcs:
+    dst: gfs_{{ _.cycles.this.yyyymmdd }}
+    src: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.this.yyyymmdd }}/{{ _.cycles.this.hh }}/atmos/gfs.t{{ _.cycles.this.hh }}z.pgrb2.0p25.f'
     leadtimes: !list '[{{ range(1, maxleadtime + 1) | join(",") }}]'
     maxleadtime: !int '{{ (leadtime.total_seconds() / 3600) | int}}'
     urlbase: https://noaa-gfs-bdp-pds.s3.amazonaws.com
