@@ -8,6 +8,11 @@ data: !dict '{{ "{" }}
   {{ "}" }}'
 _:
   bcs:
+    high:
+      maxlead: !timedelta '{{ _.bcs.maxleadtime }}'
+      maxvalid: !datetime '{{ cycle + _.bcs.high.maxlead }}'
+      offset: !timedelta '{{ 6 - (_.bcs.high.maxvalid.hour % 6) }}'
+      leadtime: !int '{{ (((_.bcs.high.maxvalid + _.bcs.high.offset) - cycle).total_seconds() / 3600) | int}}'
     leadtimes: !list '[{{ range(1, maxleadtime + 1) | join(",") }}]'
     maxleadtime: !int '{{ (leadtime.total_seconds() / 3600) | int}}'
     prefix:
