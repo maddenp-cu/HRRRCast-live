@@ -25,9 +25,9 @@ _:
         src: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
     urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   cycles:
-    nearest:
+    low:
       offset: !timedelta '00:00:{{ cycle.timestamp() % (3600 * 6) | int }}'
-      synoptic: !datetime '{{ cycle - _.cycles.nearest.offset }}'
+      synoptic: !datetime '{{ cycle - _.cycles.low.offset }}'
     prev:
       cycle: !datetime '{{ cycle - _.delta }}'
       hh: '{{ _.cycles.prev.cycle.strftime("%H") }}'
