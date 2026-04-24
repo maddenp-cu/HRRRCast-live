@@ -2,7 +2,7 @@ data: !dict '{{ "{" }}
   {% for x in range(1, _.maxleadtime.int + 1) %}
   {{ (cycle + _.delta * x).strftime("gfs_%Y%m%d_%H.grib2") }}: {{ _.bcs.prefix.src }}{{ "%03d" % (x + _.cycles.low.offset) }},
   {% endfor %}
-  {{ (cycle + _.cycles.high.foo).strftime("gfs_%Y%m%d_%H.grib2") }}: {{ _.bcs.prefix.src }}{{ "%03d" % _.cycles.high.offset }},
+  {{ (cycle + _.cycles.high.delta).strftime("gfs_%Y%m%d_%H.grib2") }}: {{ _.bcs.prefix.src }}{{ "%03d" % _.cycles.high.offset }},
   {{ _.ics.prev.prefix.dst }}_surface_f01.grib2: {{ _.ics.prev.prefix.src }}.wrfsfcf01.grib2,
   {{ _.ics.this.prefix.dst }}_pressure.grib2: {{ _.ics.this.prefix.src }}.wrfprsf00.grib2,
   {{ _.ics.this.prefix.dst }}_surface.grib2: {{ _.ics.this.prefix.src }}.wrfsfcf00.grib2,
@@ -24,11 +24,11 @@ _:
     urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   cycles:
     high:
-      delta: !timedelta '{{ 6 - (_.cycles.high.maxvalidtime.hour % 6) }}'
-      foo: !timedelta '{{ _.cycles.high.synoptic - cycle }}'
+      delta: !timedelta '{{ _.cycles.high.synoptic - cycle }}'
+      epsilon: !timedelta '{{ 6 - (_.cycles.high.maxvalidtime.hour % 6) }}'
       maxvalidtime: !datetime '{{ cycle + _.maxleadtime.timedelta }}'
       offset: !int '{{ (_.cycles.high.synoptic - _.cycles.low.synoptic).total_seconds() / 3600 }}'
-      synoptic: !datetime '{{ _.cycles.high.maxvalidtime + _.cycles.high.delta }}'
+      synoptic: !datetime '{{ _.cycles.high.maxvalidtime + _.cycles.high.epsilon }}'
     low:
       delta: !timedelta '{{ _.cycles.low.offset }}'
       hh: '{{ _.cycles.low.synoptic.strftime("%H") }}'
