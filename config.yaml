@@ -10,15 +10,16 @@ data: !dict '{{ "{" }}
 _:
   bcs:
     high:
-      leadtime: !int '{{ (((_.bcs.high.maxvalidtime + _.bcs.high.offset) - cycle).total_seconds() / 3600) | int}}'
-      maxleadtime: !timedelta '{{ _.bcs.maxleadtime }}'
+      delta: !timedelta '{{ 6 - (_.bcs.high.maxvalidtime.hour % 6) }}'
+      leadtime: !int '{{ (((_.bcs.high.maxvalidtime + _.bcs.high.delta) - cycle).total_seconds() / 3600) | int}}'
+      maxleadtime: !timedelta '{{ (leadtime.total_seconds() / 3600) | int }}'
       maxvalidtime: !datetime '{{ cycle + _.bcs.high.maxleadtime }}'
-      offset: !timedelta '{{ 6 - (_.bcs.high.maxvalidtime.hour % 6) }}'
-    leadtimes: !list '[{{ range(1, maxleadtime + 1) | join(",") }}]'
-    maxleadtime: !int '{{ (leadtime.total_seconds() / 3600) | int}}'
+    leadtimes: !list '[{{ range(leadtimes_first, leadtimes_last + 1) | join(",") }}]'
+    leadtimes_first: !int '{{ _.cycles.low.offset }}'
+    leadtimes_last: !int '{{ (_.cycles.low.offset + leadtime.total_seconds() / 3600) | int }}'
     prefix:
       dst: gfs_{{ _.cycles.this.yyyymmdd }}
-      src: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.this.yyyymmdd }}/{{ _.cycles.this.hh }}/atmos/gfs.t{{ _.cycles.this.hh }}z.pgrb2.0p25.f'
+      src: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.low.yyyymmdd }}/{{ _.cycles.low.hh }}/atmos/gfs.t{{ _.cycles.low.hh }}z.pgrb2.0p25.f'
     urlbase: https://noaa-gfs-bdp-pds.s3.amazonaws.com
   ics:
     prev:
@@ -32,8 +33,11 @@ _:
     urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   cycles:
     low:
-      offset: !timedelta '00:00:{{ cycle.timestamp() % (3600 * 6) | int }}'
-      synoptic: !datetime '{{ cycle - _.cycles.low.offset }}'
+      delta: !timedelta '{{ _.cycles.low.offset }}'
+      hh: '{{ _.cycles.low.synoptic.strftime("%H") }}'
+      offset: !int '{{ (cycle.timestamp() % (3600 * 6) / 3600) | int }}'
+      synoptic: !datetime '{{ cycle - _.cycles.low.delta }}'
+      yyyymmdd: '{{ _.cycles.low.synoptic.strftime("%Y%m%d") }}'
     prev:
       cycle: !datetime '{{ cycle - _.delta }}'
       hh: '{{ _.cycles.prev.cycle.strftime("%H") }}'
