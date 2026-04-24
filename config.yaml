@@ -1,19 +1,15 @@
 data: !dict '{{ "{" }}
-  {% for x in range(_.bcs.leadtimes.first, _.bcs.leadtimes.last + 1) %}
-  {{ _.bcs.prefix.dst }}_{{ "%03d" % x }}.grib2: {{ _.bcs.prefix.src }}{{ "%03d" % x }},
+  {% for x in range(1, _.maxleadtime.int + 1) %}
+  {{ (cycle + _.delta * x).strftime("gfs_%Y%m%d_%H.grib2") }}: {{ _.bcs.prefix.src }}{{ "%03d" % (x + _.cycles.low.offset) }},
   {% endfor %}
+  {{ (cycle + _.cycles.high.foo).strftime("gfs_%Y%m%d_%H.grib2") }}: {{ _.bcs.prefix.src }}{{ "%03d" % _.cycles.high.offset }},
+  {{ _.ics.prev.prefix.dst }}_surface_f01.grib2: {{ _.ics.prev.prefix.src }}.wrfsfcf01.grib2,
+  {{ _.ics.this.prefix.dst }}_pressure.grib2: {{ _.ics.this.prefix.src }}.wrfprsf00.grib2,
+  {{ _.ics.this.prefix.dst }}_surface.grib2: {{ _.ics.this.prefix.src }}.wrfsfcf00.grib2,
   {{ "}" }}'
-#   {{ _.bcs.prefix.dst }}_{{ "%03d" % _.cycles.high.lt }}.grib2: {{ _.bcs.prefix.src }}{{ "%03d" % _.cycles.high.lt }},
-#   {{ _.ics.prev.prefix.dst }}_surface_f01.grib2: {{ _.ics.prev.prefix.src }}.wrfsfcf01.grib2,
-#   {{ _.ics.this.prefix.dst }}_pressure.grib2: {{ _.ics.this.prefix.src }}.wrfprsf00.grib2,
-#   {{ _.ics.this.prefix.dst }}_surface.grib2: {{ _.ics.this.prefix.src }}.wrfsfcf00.grib2,
 _:
   bcs:
-    leadtimes:
-      first: !int '{{ _.cycles.low.offset + 1 }}'
-      last: !int '{{ _.cycles.low.offset + leadtime.total_seconds() / 3600 }}'
     prefix:
-      dst: gfs_{{ _.cycles.this.yyyymmdd }}
       src: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.low.yyyymmdd }}/{{ _.cycles.low.hh }}/atmos/gfs.t{{ _.cycles.low.hh }}z.pgrb2.0p25.f'
     urlbase: https://noaa-gfs-bdp-pds.s3.amazonaws.com
   ics:
@@ -29,8 +25,8 @@ _:
   cycles:
     high:
       delta: !timedelta '{{ 6 - (_.cycles.high.maxvalidtime.hour % 6) }}'
-      maxleadtime: !timedelta '{{ leadtime.total_seconds() / 3600 }}'
-      maxvalidtime: !datetime '{{ cycle + _.cycles.high.maxleadtime }}'
+      foo: !timedelta '{{ _.cycles.high.synoptic - cycle }}'
+      maxvalidtime: !datetime '{{ cycle + _.maxleadtime.timedelta }}'
       offset: !int '{{ (_.cycles.high.synoptic - _.cycles.low.synoptic).total_seconds() / 3600 }}'
       synoptic: !datetime '{{ _.cycles.high.maxvalidtime + _.cycles.high.delta }}'
     low:
@@ -47,3 +43,6 @@ _:
       hh: '{{ cycle.strftime("%H") }}'
       yyyymmdd: '{{ cycle.strftime("%Y%m%d") }}'
   delta: !timedelta 01:00:00
+  maxleadtime:
+    int: !int '{{ leadtime.total_seconds() / 3600 }}'
+    timedelta: !timedelta '{{ _.maxleadtime.int }}'
