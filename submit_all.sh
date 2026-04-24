@@ -73,6 +73,8 @@ atparse < $PACKAGEROOT/jobs/job-get-bcs.sh > $DATAROOT/logs/job-get-bcs.sh
 jobid2=$(submit_with_check sbatch --parsable $DATAROOT/logs/job-get-bcs.sh)
 echo "Submitted job: $jobid2"
 
+exit 0
+
 atparse < $PACKAGEROOT/jobs/job-make-ics.sh > $DATAROOT/logs/job-make-ics.sh
 jobid3=$(submit_with_check sbatch --dependency=afterok:$jobid1 --parsable $DATAROOT/logs/job-make-ics.sh)
 echo "Submitted job: $jobid3"

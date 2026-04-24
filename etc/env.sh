@@ -1,3 +1,3 @@
 #!/bin/bash
-source "/scratch3/BMC/gsd-hpcs/Daniel.Abdi/miniconda3/etc/profile.d/conda.sh"
+. /scratch4/BMC/gsd-hpcs/Paul.Madden/conda/etc/profile.d/conda.sh
 conda activate hrrrcast
