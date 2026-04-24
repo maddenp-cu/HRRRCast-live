@@ -11,10 +11,6 @@ _:
   bcs:
     pre: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.low.yyyymmdd }}/{{ _.cycles.low.hh }}/atmos/gfs.t{{ _.cycles.low.hh }}z.pgrb2.0p25.f'
     urlbase: https://noaa-gfs-bdp-pds.s3.amazonaws.com
-  ics:
-    prev: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
-    this: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
-    urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   cycles:
     high:
       delta: !timedelta '{{ _.cycles.high.synoptic - cycle }}'
@@ -39,6 +35,10 @@ _:
   fmt:
     gfs: gfs_%Y%m%d_%H.grib2
     hrrr: hrrr_%Y%m%d_%H
+  ics:
+    prev: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
+    this: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
+    urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   maxleadtime:
     int: !int '{{ leadtime.total_seconds() / 3600 }}'
     timedelta: !timedelta '{{ _.maxleadtime.int }}'
