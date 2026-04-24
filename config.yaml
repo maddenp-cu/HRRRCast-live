@@ -1,22 +1,17 @@
 data: !dict '{{ "{" }}
-  {% for x in _.bcs.leadtimes %}
+  {% for x in range(_.bcs.leadtimes.first, _.bcs.leadtimes.last + 1) %}
   {{ _.bcs.prefix.dst }}_{{ "%03d" % x }}.grib2: {{ _.bcs.prefix.src }}{{ "%03d" % x }},
   {% endfor %}
-  {{ _.bcs.prefix.dst }}_{{ "%03d" % _.bcs.high.leadtime }}.grib2: {{ _.bcs.prefix.src }}{{ "%03d" % _.bcs.high.leadtime }},
-  {{ _.ics.prev.prefix.dst }}_surface_f01.grib2: {{ _.ics.prev.prefix.src }}.wrfsfcf01.grib2,
-  {{ _.ics.this.prefix.dst }}_pressure.grib2: {{ _.ics.this.prefix.src }}.wrfprsf00.grib2,
-  {{ _.ics.this.prefix.dst }}_surface.grib2: {{ _.ics.this.prefix.src }}.wrfsfcf00.grib2,
   {{ "}" }}'
+#   {{ _.bcs.prefix.dst }}_{{ "%03d" % _.cycles.high.lt }}.grib2: {{ _.bcs.prefix.src }}{{ "%03d" % _.cycles.high.lt }},
+#   {{ _.ics.prev.prefix.dst }}_surface_f01.grib2: {{ _.ics.prev.prefix.src }}.wrfsfcf01.grib2,
+#   {{ _.ics.this.prefix.dst }}_pressure.grib2: {{ _.ics.this.prefix.src }}.wrfprsf00.grib2,
+#   {{ _.ics.this.prefix.dst }}_surface.grib2: {{ _.ics.this.prefix.src }}.wrfsfcf00.grib2,
 _:
   bcs:
-    high:
-      delta: !timedelta '{{ 6 - (_.bcs.high.maxvalidtime.hour % 6) }}'
-      leadtime: !int '{{ ((_.bcs.high.maxvalidtime + _.bcs.high.delta) - cycle).total_seconds() / 3600 }}'
-      maxleadtime: !timedelta '{{ leadtime.total_seconds() / 3600 }}'
-      maxvalidtime: !datetime '{{ cycle + _.bcs.high.maxleadtime }}'
-    leadtimes: !list '[{{ range(leadtimes_first, leadtimes_last + 1) | join(",") }}]'
-    leadtimes_first: !int '{{ _.cycles.low.offset }}'
-    leadtimes_last: !int '{{ _.cycles.low.offset + leadtime.total_seconds() / 3600 }}'
+    leadtimes:
+      first: !int '{{ _.cycles.low.offset + 1 }}'
+      last: !int '{{ _.cycles.low.offset + leadtime.total_seconds() / 3600 }}'
     prefix:
       dst: gfs_{{ _.cycles.this.yyyymmdd }}
       src: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.low.yyyymmdd }}/{{ _.cycles.low.hh }}/atmos/gfs.t{{ _.cycles.low.hh }}z.pgrb2.0p25.f'
@@ -32,6 +27,12 @@ _:
         src: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
     urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   cycles:
+    high:
+      delta: !timedelta '{{ 6 - (_.cycles.high.maxvalidtime.hour % 6) }}'
+      maxleadtime: !timedelta '{{ leadtime.total_seconds() / 3600 }}'
+      maxvalidtime: !datetime '{{ cycle + _.cycles.high.maxleadtime }}'
+      offset: !int '{{ (_.cycles.high.synoptic - _.cycles.low.synoptic).total_seconds() / 3600 }}'
+      synoptic: !datetime '{{ _.cycles.high.maxvalidtime + _.cycles.high.delta }}'
     low:
       delta: !timedelta '{{ _.cycles.low.offset }}'
       hh: '{{ _.cycles.low.synoptic.strftime("%H") }}'
