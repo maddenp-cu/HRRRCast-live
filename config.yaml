@@ -2,7 +2,7 @@ data: !dict '{{ "{" }}
   {% for x in range(1, _.maxleadtime.int + 1) %}
   {{ _.dir }}/{{ (cycle + _.td * x).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % (x + _.cycles.below.incr) }},
   {% endfor %}
-  {{ _.dir }}/{{ (cycle + _.cycles.above.td).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % _.cycles.above.offset }},
+  {{ _.dir }}/{{ (cycle + _.cycles.above.td).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % _.cycles.above.leadtime }},
   {{ _.dir }}/{{ _.cycles.prev.cycle.strftime(_.fmt.hrrr) }}_surface_f01.grib2: {{ _.prefix.ics.prev }}.wrfsfcf01.grib2,
   {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_pressure.grib2: {{ _.prefix.ics.this }}.wrfprsf00.grib2,
   {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_surface.grib2: {{ _.prefix.ics.this }}.wrfsfcf00.grib2,
@@ -11,8 +11,8 @@ _:
   cycles:
     above:
       hours_before_next_synoptic: !timedelta '{{ (6 - (_.cycles.above.maxvalidtime.hour % 6)) % 6 }}'
+      leadtime: !int '{{ (_.cycles.above.synoptic - _.cycles.below.synoptic).total_seconds() / 3600 }}'
       maxvalidtime: !datetime '{{ cycle + _.maxleadtime.td }}'
-      offset: !int '{{ (_.cycles.above.synoptic - _.cycles.below.synoptic).total_seconds() / 3600 }}'
       synoptic: !datetime '{{ _.cycles.above.maxvalidtime + _.cycles.above.hours_before_next_synoptic }}'
       td: !timedelta '{{ _.cycles.above.synoptic - cycle }}'
     below:
