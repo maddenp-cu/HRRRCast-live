@@ -8,9 +8,6 @@ data: !dict '{{ "{" }}
   {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_surface.grib2: {{ _.prefix.ics.this }}.wrfsfcf00.grib2,
   {{ "}" }}'
 _:
-  urlbase:
-    bcs: https://noaa-gfs-bdp-pds.s3.amazonaws.com
-    ics: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   cycles:
     above:
       td: !timedelta '{{ _.cycles.above.synoptic - cycle }}'
@@ -44,3 +41,6 @@ _:
       prev: '{{ _.urlbase.ics }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
       this: '{{ _.urlbase.ics }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
   td: !timedelta 01:00:00
+  urlbase:
+    bcs: https://noaa-gfs-bdp-pds.s3.amazonaws.com
+    ics: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
