@@ -3,16 +3,14 @@ data: !dict '{{ "{" }}
   {{ _.dir }}/{{ (cycle + _.delta * x).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % (x + _.cycles.below.offset) }},
   {% endfor %}
   {{ _.dir }}/{{ (cycle + _.cycles.above.delta).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % _.cycles.above.offset }},
-  {{ _.dir }}/{{ _.cycles.prev.cycle.strftime(_.fmt.hrrr) }}_surface_f01.grib2: {{ _.ics.prefix.prev }}.wrfsfcf01.grib2,
-  {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_pressure.grib2: {{ _.ics.prefix.this }}.wrfprsf00.grib2,
-  {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_surface.grib2: {{ _.ics.prefix.this }}.wrfsfcf00.grib2,
+  {{ _.dir }}/{{ _.cycles.prev.cycle.strftime(_.fmt.hrrr) }}_surface_f01.grib2: {{ _.prefix.ics_prev }}.wrfsfcf01.grib2,
+  {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_pressure.grib2: {{ _.prefix.ics_this }}.wrfprsf00.grib2,
+  {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_surface.grib2: {{ _.prefix.ics_this }}.wrfsfcf00.grib2,
   {{ "}" }}'
 _:
   urlbase:
     bcs: https://noaa-gfs-bdp-pds.s3.amazonaws.com
     ics: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
-  bcs:
-    prefix: 
   cycles:
     above:
       delta: !timedelta '{{ _.cycles.above.synoptic - cycle }}'
@@ -38,15 +36,10 @@ _:
   fmt:
     gfs: gfs_%Y%m%d_%H.grib2
     hrrr: hrrr_%Y%m%d_%H
-  ics:
-    prefix:
-      prev: '{{ _.urlbase.ics }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
-      this: '{{ _.urlbase.ics }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
   maxleadtime:
     int: !int '{{ leadtime.total_seconds() / 3600 }}'
     timedelta: !timedelta '{{ _.maxleadtime.int }}'
   prefix:
     bcs: '{{ _.urlbase.bcs }}/gfs.{{ _.cycles.below.yyyymmdd }}/{{ _.cycles.below.hh }}/atmos/gfs.t{{ _.cycles.below.hh }}z.pgrb2.0p25.f'
-    ics-prev:
-    ics-this:
-    
+    ics_prev: '{{ _.urlbase.ics }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
+    ics_this: '{{ _.urlbase.ics }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
