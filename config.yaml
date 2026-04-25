@@ -1,8 +1,8 @@
 data: !dict '{{ "{" }}
   {% for x in range(1, _.maxleadtime.int + 1) %}
-  {{ _.dir }}/{{ (cycle + _.delta * x).strftime(_.fmt.gfs) }}: {{ _.bcs.prefix }}{{ "%03d" % (x + _.cycles.below.offset) }},
+  {{ _.dir }}/{{ (cycle + _.delta * x).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % (x + _.cycles.below.offset) }},
   {% endfor %}
-  {{ _.dir }}/{{ (cycle + _.cycles.above.delta).strftime(_.fmt.gfs) }}: {{ _.bcs.prefix }}{{ "%03d" % _.cycles.above.offset }},
+  {{ _.dir }}/{{ (cycle + _.cycles.above.delta).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % _.cycles.above.offset }},
   {{ _.dir }}/{{ _.cycles.prev.cycle.strftime(_.fmt.hrrr) }}_surface_f01.grib2: {{ _.ics.prefix.prev }}.wrfsfcf01.grib2,
   {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_pressure.grib2: {{ _.ics.prefix.this }}.wrfprsf00.grib2,
   {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_surface.grib2: {{ _.ics.prefix.this }}.wrfsfcf00.grib2,
@@ -12,7 +12,7 @@ _:
     bcs: https://noaa-gfs-bdp-pds.s3.amazonaws.com
     ics: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   bcs:
-    prefix: '{{ _.urlbase.bcs }}/gfs.{{ _.cycles.below.yyyymmdd }}/{{ _.cycles.below.hh }}/atmos/gfs.t{{ _.cycles.below.hh }}z.pgrb2.0p25.f'
+    prefix: 
   cycles:
     above:
       delta: !timedelta '{{ _.cycles.above.synoptic - cycle }}'
@@ -45,3 +45,8 @@ _:
   maxleadtime:
     int: !int '{{ leadtime.total_seconds() / 3600 }}'
     timedelta: !timedelta '{{ _.maxleadtime.int }}'
+  prefix:
+    bcs: '{{ _.urlbase.bcs }}/gfs.{{ _.cycles.below.yyyymmdd }}/{{ _.cycles.below.hh }}/atmos/gfs.t{{ _.cycles.below.hh }}z.pgrb2.0p25.f'
+    ics-prev:
+    ics-this:
+    
