@@ -14,7 +14,7 @@ _:
   cycles:
     high:
       delta: !timedelta '{{ _.cycles.high.synoptic - cycle }}'
-      epsilon: !timedelta '{{ 6 - (_.cycles.high.maxvalidtime.hour % 6) }}'
+      epsilon: !timedelta '{{ (6 - (_.cycles.high.maxvalidtime.hour % 6)) % 6 }}'
       maxvalidtime: !datetime '{{ cycle + _.maxleadtime.timedelta }}'
       offset: !int '{{ (_.cycles.high.synoptic - _.cycles.low.synoptic).total_seconds() / 3600 }}'
       synoptic: !datetime '{{ _.cycles.high.maxvalidtime + _.cycles.high.epsilon }}'
