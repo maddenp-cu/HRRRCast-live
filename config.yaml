@@ -10,16 +10,16 @@ data: !dict '{{ "{" }}
 _:
   cycles:
     above:
-      td: !timedelta '{{ _.cycles.above.synoptic - cycle }}'
       hours_before_next_synoptic: !timedelta '{{ (6 - (_.cycles.above.maxvalidtime.hour % 6)) % 6 }}'
       maxvalidtime: !datetime '{{ cycle + _.maxleadtime.td }}'
       offset: !int '{{ (_.cycles.above.synoptic - _.cycles.below.synoptic).total_seconds() / 3600 }}'
       synoptic: !datetime '{{ _.cycles.above.maxvalidtime + _.cycles.above.hours_before_next_synoptic }}'
+      td: !timedelta '{{ _.cycles.above.synoptic - cycle }}'
     below:
-      td: !timedelta '{{ _.cycles.below.offset }}'
       hh: '{{ _.cycles.below.synoptic.strftime("%H") }}'
       offset: !int '{{ cycle.timestamp() % (3600 * 6) / 3600 }}'
       synoptic: !datetime '{{ cycle - _.cycles.below.td }}'
+      td: !timedelta '{{ _.cycles.below.offset }}'
       yyyymmdd: '{{ _.cycles.below.synoptic.strftime("%Y%m%d") }}'
     prev:
       cycle: !datetime '{{ cycle - _.td }}'
