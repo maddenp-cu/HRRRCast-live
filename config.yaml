@@ -3,9 +3,9 @@ data: !dict '{{ "{" }}
   {{ _.dir }}/{{ (cycle + _.delta * x).strftime(_.fmt.gfs) }}: {{ _.bcs.prefix }}{{ "%03d" % (x + _.cycles.below.offset) }},
   {% endfor %}
   {{ _.dir }}/{{ (cycle + _.cycles.above.delta).strftime(_.fmt.gfs) }}: {{ _.bcs.prefix }}{{ "%03d" % _.cycles.above.offset }},
-  {{ _.dir }}/{{ _.cycles.previous.cycle.strftime(_.fmt.hrrr) }}_surface_f01.grib2: {{ _.ics.previous }}.wrfsfcf01.grib2,
-  {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_pressure.grib2: {{ _.ics.this }}.wrfprsf00.grib2,
-  {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_surface.grib2: {{ _.ics.this }}.wrfsfcf00.grib2,
+  {{ _.dir }}/{{ _.cycles.prev.cycle.strftime(_.fmt.hrrr) }}_surface_f01.grib2: {{ _.ics.prefix.prev }}.wrfsfcf01.grib2,
+  {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_pressure.grib2: {{ _.ics.prefix.this }}.wrfprsf00.grib2,
+  {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_surface.grib2: {{ _.ics.prefix.this }}.wrfsfcf00.grib2,
   {{ "}" }}'
 _:
   bcs:
@@ -14,20 +14,20 @@ _:
   cycles:
     above:
       delta: !timedelta '{{ _.cycles.above.synoptic - cycle }}'
-      hours_behind_synoptic: !timedelta '{{ (6 - (_.cycles.above.maxvalidtime.hour % 6)) % 6 }}'
+      hours_to_next_synoptic: !timedelta '{{ (6 - (_.cycles.above.maxvalidtime.hour % 6)) % 6 }}'
       maxvalidtime: !datetime '{{ cycle + _.maxleadtime.timedelta }}'
       offset: !int '{{ (_.cycles.above.synoptic - _.cycles.below.synoptic).total_seconds() / 3600 }}'
-      synoptic: !datetime '{{ _.cycles.above.maxvalidtime + _.cycles.above.hours_behind_synoptic }}'
+      synoptic: !datetime '{{ _.cycles.above.maxvalidtime + _.cycles.above.hours_to_next_synoptic }}'
     below:
       delta: !timedelta '{{ _.cycles.below.offset }}'
       hh: '{{ _.cycles.below.synoptic.strftime("%H") }}'
       offset: !int '{{ cycle.timestamp() % (3600 * 6) / 3600 }}'
       synoptic: !datetime '{{ cycle - _.cycles.below.delta }}'
       yyyymmdd: '{{ _.cycles.below.synoptic.strftime("%Y%m%d") }}'
-    previous:
+    prev:
       cycle: !datetime '{{ cycle - _.delta }}'
-      hh: '{{ _.cycles.previous.cycle.strftime("%H") }}'
-      yyyymmdd: '{{ _.cycles.previous.cycle.strftime("%Y%m%d") }}'
+      hh: '{{ _.cycles.prev.cycle.strftime("%H") }}'
+      yyyymmdd: '{{ _.cycles.prev.cycle.strftime("%Y%m%d") }}'
     this:
       hh: '{{ cycle.strftime("%H") }}'
       yyyymmdd: '{{ cycle.strftime("%Y%m%d") }}'
@@ -37,8 +37,9 @@ _:
     gfs: gfs_%Y%m%d_%H.grib2
     hrrr: hrrr_%Y%m%d_%H
   ics:
-    previous: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.previous.yyyymmdd }}/conus/hrrr.t{{ _.cycles.previous.hh }}z'
-    this: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
+    prefix:
+      prev: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
+      this: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
     urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   maxleadtime:
     int: !int '{{ leadtime.total_seconds() / 3600 }}'
