@@ -1,6 +1,6 @@
 data: !dict '{{ "{" }}
   {% for x in range(1, _.maxleadtime.int + 1) %}
-  {{ _.dir }}/{{ (cycle + _.td * x).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % (x + _.cycles.below.incr) }},
+  {{ _.dir }}/{{ (cycle + _.td * x).strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % (x + _.cycles.below.offset) }},
   {% endfor %}
   {{ _.dir }}/{{ _.cycles.above.synoptic.strftime(_.fmt.gfs) }}: {{ _.prefix.bcs }}{{ "%03d" % _.cycles.above.leadtime }},
   {{ _.dir }}/{{ _.cycles.prev.cycle.strftime(_.fmt.hrrr) }}_surface_f01.grib2: {{ _.prefix.ics.prev }}.wrfsfcf01.grib2,
@@ -15,9 +15,9 @@ _:
       synoptic: !datetime '{{ _.cycles.this.maxvalidtime + _.cycles.above.hours_before_next_synoptic }}'
     below:
       hh: '{{ _.cycles.below.synoptic.strftime("%H") }}'
-      incr: !int '{{ cycle.timestamp() % (3600 * 6) / 3600 }}'
+      offset: !int '{{ cycle.timestamp() % (3600 * 6) / 3600 }}'
       synoptic: !datetime '{{ cycle - _.cycles.below.td }}'
-      td: !timedelta '{{ _.cycles.below.incr }}'
+      td: !timedelta '{{ _.cycles.below.offset }}'
       yyyymmdd: '{{ _.cycles.below.synoptic.strftime("%Y%m%d") }}'
     prev:
       cycle: !datetime '{{ cycle - _.td }}'
