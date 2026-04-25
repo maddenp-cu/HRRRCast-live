@@ -8,9 +8,11 @@ data: !dict '{{ "{" }}
   {{ _.dir }}/{{ cycle.strftime(_.fmt.hrrr) }}_surface.grib2: {{ _.ics.prefix.this }}.wrfsfcf00.grib2,
   {{ "}" }}'
 _:
+  urlbase:
+    bcs: https://noaa-gfs-bdp-pds.s3.amazonaws.com
+    ics: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
   bcs:
-    prefix: '{{ _.bcs.urlbase }}/gfs.{{ _.cycles.below.yyyymmdd }}/{{ _.cycles.below.hh }}/atmos/gfs.t{{ _.cycles.below.hh }}z.pgrb2.0p25.f'
-    urlbase: https://noaa-gfs-bdp-pds.s3.amazonaws.com
+    prefix: '{{ _.urlbase.bcs }}/gfs.{{ _.cycles.below.yyyymmdd }}/{{ _.cycles.below.hh }}/atmos/gfs.t{{ _.cycles.below.hh }}z.pgrb2.0p25.f'
   cycles:
     above:
       delta: !timedelta '{{ _.cycles.above.synoptic - cycle }}'
@@ -38,9 +40,8 @@ _:
     hrrr: hrrr_%Y%m%d_%H
   ics:
     prefix:
-      prev: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
-      this: '{{ _.ics.urlbase }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
-    urlbase: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
+      prev: '{{ _.urlbase.ics }}/hrrr.{{ _.cycles.prev.yyyymmdd }}/conus/hrrr.t{{ _.cycles.prev.hh }}z'
+      this: '{{ _.urlbase.ics }}/hrrr.{{ _.cycles.this.yyyymmdd }}/conus/hrrr.t{{ _.cycles.this.hh }}z'
   maxleadtime:
     int: !int '{{ leadtime.total_seconds() / 3600 }}'
     timedelta: !timedelta '{{ _.maxleadtime.int }}'
