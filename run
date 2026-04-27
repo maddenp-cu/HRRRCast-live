@@ -3,8 +3,9 @@
 set -euo pipefail
 
 getdata() {
-  local args missing
-  args=(
+  local cmd
+  cmd=(
+    uw fs copy
     -c config.yaml
     --key-path data
     --cycle $init_time
@@ -12,7 +13,7 @@ getdata() {
     --thread 8
     --report
   )
-  uw fs copy ${args[*]} | jq -e 'select(."not-ready" == [])' >/dev/null
+  ${cmd[*]} | jq -e 'select(."not-ready" == [])' >/dev/null
 }
 
 parseargs() {
