@@ -2,7 +2,21 @@
 
 set -euo pipefail
 
+getdata() {
+  local args missing
+  args=(
+    -c config.yaml
+    --key-path data
+    --cycle $init_time
+    --leadtime $fcst_length
+    --thread 8
+    --report
+  )
+  uw fs copy ${args[*]} | jq -e 'select(."not-ready" == [])' >/dev/null
+}
+
 parseargs() {
+  local var
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --init-time)   init_time="$2"   ;;
@@ -14,7 +28,7 @@ parseargs() {
     esac
     shift 2
   done
-  for var in init_time fcst_length ensembles gpus account; do
+  for var in init_time fcst_length; do # ensembles gpus account
     if [[ -z "${!var:-}" ]]; then
       usage
     fi
@@ -25,20 +39,15 @@ usage() {
   cat <<EOF >&2
 Usage: $(basename "$0") --init-time VALUE --fcst-length VALUE --ensembles VALUE --gpus VALUE --account VALUE
 
-Required switches:
+Required settings:
   --init-time   Initialization time in YYYY-MM-DDTHH format
   --fcst-length Forecast length as an integer
-  --ensembles   Number of ensembles
-  --gpus        Number of GPUs
-  --account     Account name
 EOF
   exit 1
+#   --ensembles   Number of ensembles
+#   --gpus        Number of GPUs
+#   --account     Account name
 }
 
 parseargs $@
-
-echo "init-time:   $init_time"
-echo "fcst-length: $fcst_length"
-echo "ensembles:   $ensembles"
-echo "gpus:        $gpus"
-echo "account:     $account"
+getdata
