@@ -2,47 +2,43 @@
 
 set -euo pipefail
 
-getdata() {
-  local cmd
-  cmd=(
-    uw fs copy
-    -c config.yaml
-    --key-path data
-    --cycle $init_time
-    --leadtime $fcst_length
-    --threads 8
-    --report
-  )
-  (set -x && ${cmd[*]}) | jq -e 'select(."not-ready" == [])' >/dev/null
-}
-
-parseargs() {
-  local var
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --init-time)   init_time="$2"   ;;
-      --fcst-length) fcst_length="$2" ;;
-      *)             usage            ;;
-    esac
-    shift 2
-  done
-  for var in init_time fcst_length; do # ensembles gpus account
-    if [[ -z "${!var:-}" ]]; then
-      usage
-    fi
-  done
-}
-
 usage() {
   cat <<EOF >&2
-Usage: $(basename "$0") --init-time VALUE --fcst-length VALUE
+Usage: $(basename "$0") --init VALUE --length VALUE
 
-Required settings:
-  --init-time   Initialization time in YYYY-MM-DDTHH format
-  --fcst-length Forecast length as an integer
+Settings:
+  --init   Forecast init time as YYYY-MM-DDTHH
+  --length Forecast length in hours
 EOF
   exit 1
 }
 
-parseargs $@
-getdata
+# Parse args:
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --init)   init="$2"   ;;
+    --length) length="$2" ;;
+    *)        usage       ;;
+  esac
+  shift 2
+done
+
+# Check args:
+
+for var in init length; do
+  test -z "${!var:-}" && usage || true
+done
+
+# Get data:
+
+cmd=(
+  uw fs copy
+  --config config.yaml
+  --key-path data
+  --cycle $init
+  --leadtime $length
+  --threads 8
+  --report
+)
+(set -x && ${cmd[*]}) | jq -e 'select(."not-ready" == [])' >/dev/null
