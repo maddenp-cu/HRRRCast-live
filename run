@@ -10,10 +10,10 @@ getdata() {
     --key-path data
     --cycle $init_time
     --leadtime $fcst_length
-    --thread 8
+    --threads 8
     --report
   )
-  ${cmd[*]} | jq -e 'select(."not-ready" == [])' >/dev/null
+  (set -x && ${cmd[*]}) | jq -e 'select(."not-ready" == [])' >/dev/null
 }
 
 parseargs() {
