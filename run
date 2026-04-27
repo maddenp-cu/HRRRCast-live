@@ -22,9 +22,6 @@ parseargs() {
     case "$1" in
       --init-time)   init_time="$2"   ;;
       --fcst-length) fcst_length="$2" ;;
-      --ensembles)   ensembles="$2"   ;;
-      --gpus)        gpus="$2"        ;;
-      --account)     account="$2"     ;;
       *)             usage            ;;
     esac
     shift 2
@@ -38,16 +35,13 @@ parseargs() {
 
 usage() {
   cat <<EOF >&2
-Usage: $(basename "$0") --init-time VALUE --fcst-length VALUE --ensembles VALUE --gpus VALUE --account VALUE
+Usage: $(basename "$0") --init-time VALUE --fcst-length VALUE
 
 Required settings:
   --init-time   Initialization time in YYYY-MM-DDTHH format
   --fcst-length Forecast length as an integer
 EOF
   exit 1
-#   --ensembles   Number of ensembles
-#   --gpus        Number of GPUs
-#   --account     Account name
 }
 
 parseargs $@
