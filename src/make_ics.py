@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 GRIB Preprocessing Script
 
@@ -7,7 +7,7 @@ by the forecasting model. This stage is CPU-intensive and handles all the
 GRIB file parsing and normalization.
 
 Usage:
-    python preprocess_grib.py <norm_file> <inittime> [--base_dir DIR] [--output_dir DIR]
+    preprocess_grib.py <norm_file> <inittime> [--base_dir DIR] [--output_dir DIR]
 """
 
 import argparse

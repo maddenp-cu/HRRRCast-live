@@ -10,7 +10,7 @@ rundir     = $(shell uw config realize -i config.yaml --key-path app.basedir)/$(
 
 all: $(rocotoxml) $(datayaml)
 	$(call cyclecheck)
-	uw rocoto iterate --cycle $(cycle) --database $(rocotodb) --task forecast --workflow $<
+	uw rocoto iterate --cycle $(cycle) --database $(rocotodb) --task ics --workflow $<
 
 $(datayaml): config.yaml
 	$(call cyclecheck)
