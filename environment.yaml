@@ -22,7 +22,7 @@ dependencies:
   - seaborn 0.13.2.*
   - tensorflow 2.15.0.*
   - tqdm 4.67.3.*
-  - uwtools 2.15.*
+  - uwtools 2.16.*
   - xarray 2026.4.0.*
   - xesmf 0.9.2.*
   - zarr 3.1.5.*
