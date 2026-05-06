@@ -1,6 +1,7 @@
 name: hrrrcast
 channels:
   - conda-forge
+  - oar-gsl
   - nodefaults
 dependencies:
   - bottleneck 1.6.0.*
@@ -18,6 +19,7 @@ dependencies:
   - numpy 1.26.4.*
   - pandas 3.0.2.*
   - pygrib 2.1.8.*
+  - rocoto 1.3.7.*
   - scikit-image 0.20.0.*
   - seaborn 0.13.2.*
   - tensorflow 2.15.0.*
