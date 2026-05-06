@@ -40,6 +40,7 @@ rocoto:
         cores: 1
         dependency: {taskdep: {attrs: {task: data}}}
         join: '{{ _.dir }}/make_ics.out'
+        memory: 10G
         partition: '{{ app.partitions.cpu }}'
         walltime: 00:10:00
 _:
