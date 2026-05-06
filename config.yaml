@@ -30,7 +30,7 @@ rocoto:
         walltime: 00:01:00
         dependency:
           sh:
-            command: uw fs copy -c {{ _.dir }}/data.yaml --report
+            command: uw fs copy -c {{ _.dir }}/data.yaml --report --threads 4 2>{{ _.dir }}/data.out | jq -e 'select(.notready == [])' >{{ _.dir }}/data.json
 _:
   cycles:
     above:
