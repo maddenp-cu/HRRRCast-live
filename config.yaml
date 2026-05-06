@@ -25,11 +25,12 @@ rocoto:
           cycledefs: one
         account: gsd-hpcs
         command: /bin/true
+        join: '{{ _.dir }}/out'
         nodes: "1:ppn=1"
         walltime: 00:01:00
         dependency:
           sh:
-            command: /bin/true
+            command: uw fs copy -c {{ _.dir }}/data.yaml --report
 _:
   cycles:
     above:
