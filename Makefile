@@ -6,7 +6,7 @@ cyclere    = ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}$
 rocotodb   = $(rundir)/rocoto.db
 rocotoxml  = $(rundir)/rocoto.xml
 rocotoyaml = $(rundir)/rocoto.yaml
-rundir     = $(shell uw config realize -i config.yaml --key-path basedir)/$(call cyclefmt,%Y%m%d)/$(call cyclefmt,%H)
+rundir     = $(shell uw config realize -i config.yaml --key-path app.basedir)/$(call cyclefmt,%Y%m%d)/$(call cyclefmt,%H)
 
 all: $(rocotoxml) $(datayaml)
 	$(call cyclecheck)
