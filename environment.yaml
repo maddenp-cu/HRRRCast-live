@@ -1,8 +1,9 @@
 name: hrrrcast
 channels:
-  - conda-forge
-  - oar-gsl
   - nodefaults
+  - conda-forge
+  - ufs-community
+  - oar-gsl
 dependencies:
   - bottleneck 1.6.0.*
   - cartopy 0.25.0.*
@@ -24,7 +25,7 @@ dependencies:
   - seaborn 0.13.2.*
   - tensorflow 2.15.0.*
   - tqdm 4.67.3.*
-  - uwtools 2.16.*
+  - uwtools 2.18.*
   - xarray 2026.4.0.*
   - xesmf 0.9.2.*
   - zarr 3.1.5.*
